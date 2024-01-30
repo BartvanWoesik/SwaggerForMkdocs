@@ -1,0 +1,9 @@
+site_name: SwaggerForMkdocs
+nav:
+  - Home: index.md
+  - Code: code.md    
+theme: material
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
