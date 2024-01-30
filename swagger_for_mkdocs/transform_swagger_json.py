@@ -2,6 +2,19 @@ import json
 from fastapi import FastAPI
 from swagger_for_mkdocs.transform_app import modify_app_for_swagger
 
+def generate_openapi_config(app: FastAPI, title: str, tags: str, version: str, middleware: bool) -> dict:
+    """
+    Generates OpenAPI config from a FastAPI app with optional modifications.
+    """
+    modified_app = modify_app_for_swagger(app, title=title, tags=tags, version=version, middleware=middleware)
+    return modified_app.openapi()
+
+def save_openapi_json(openapi_data: dict, path: str = '', config_name: str = 'openapi.json') -> None:
+    """
+    Saves OpenAPI data to a JSON file.
+    """
+    with open(path + config_name, "w") as file:
+        json.dump(openapi_data, file, indent=2)
 
 def change_server_host(openapi_json: dict, new_host: str, description: str) -> dict:
     """
@@ -24,37 +37,24 @@ def change_server_host(openapi_json: dict, new_host: str, description: str) -> d
                                 }]
     return openapi_json
 
-
-
-def save_openapi_json(app: FastAPI, 
-                    path:str = '', 
-                    config_name:str = 'openapi.json', 
-                    host: str= None, 
-                    description: str = 'No description.',
-                    title: str = "", 
-                    tags: str = None,
-                    version: str="", 
-                    middleware: bool = True):
+def save_openapi_config(app: FastAPI, path: str = '', config_name: str = 'openapi.json',
+                        title: str = "", tags: str = None, version: str = "",
+                        host: str = None, description: str = 'No description.', middleware: bool = True) -> None:
     """
-    Saves and corrects the openapi configuration as a json file. 
-    
+    Saves and corrects the OpenAPI configuration as a JSON file.
+
     Args:
         app: FastAPI object.
-        path: Location to store the openapi configuration
-        config_name: Name of the openapi configuration
-        new_host: string with the base url
+        path: Location to store the OpenAPI configuration.
+        config_name: Name of the OpenAPI configuration file.
         title: Title of FastAPI app.
         tags: Tags related to FastAPI app.
         version: Version of FastAPI app.
-        middleware: Allow middelware to be set. 
-    
+        host: Base URL of the server.
+        description: Description of the FastAPI app.
+        middleware: Allow middleware to be set.
     """
-    app = modify_app_for_swagger(app, title = title, tags = tags, version = version, middleware = middleware)
-
-    openapi_data = app.openapi()
+    openapi_config = generate_openapi_config(app, title=title, tags=tags, version=version, middleware=middleware)
     if host:
-        openapi_data = change_server_host(openapi_data, host , description)
- 
-    # Change "openapi.json" to desired filename
-    with open(path + config_name, "w") as file:
-        json.dump(openapi_data, file, indent =2 )
+        openapi_config = change_server_host(openapi_config, host, description)
+    save_openapi_json(openapi_config, path=path, config_name=config_name)
