@@ -1,1 +1,0 @@
-swagger_for_mkdocs
