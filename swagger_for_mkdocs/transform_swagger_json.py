@@ -49,7 +49,7 @@ def save_openapi_json(app: FastAPI,
         middleware: Allow middelware to be set. 
     
     """
-    modify_app_for_swagger(app, title = title, tags = tags, version = version, middleware = middleware)
+    app = modify_app_for_swagger(app, title = title, tags = tags, version = version, middleware = middleware)
 
     openapi_data = app.openapi()
     if host:

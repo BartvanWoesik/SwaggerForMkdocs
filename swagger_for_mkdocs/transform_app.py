@@ -30,4 +30,4 @@ def modify_app_for_swagger(app: FastAPI, title: str = "", tags: str = None, vers
             allow_headers=["*"],
         )
 
-    return 
+    return app
